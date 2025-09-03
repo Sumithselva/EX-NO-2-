@@ -39,9 +39,9 @@ STEP-5: Display the obtained cipher text.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define SIZE 30
+#define SIZE 100
 
-// Convert string to lowercase
+
 void toLowerCase(char plain[], int ps) {
     for (int i = 0; i < ps; i++) {
         if (plain[i] >= 'A' && plain[i] <= 'Z')
@@ -49,7 +49,7 @@ void toLowerCase(char plain[], int ps) {
     }
 }
 
-// Remove all spaces from a string
+
 int removeSpaces(char* plain, int ps) {
     int i, count = 0;
     for (i = 0; i < ps; i++) {
@@ -60,7 +60,7 @@ int removeSpaces(char* plain, int ps) {
     return count;
 }
 
-// Generate the 5x5 key square
+
 void generateKeyTable(char key[], int ks, char keyT[5][5]) {
     int dicty[26] = {0};
     int i, j, k;
@@ -76,7 +76,6 @@ void generateKeyTable(char key[], int ks, char keyT[5][5]) {
     i = 0;
     j = 0;
 
-    // fill key table with key
     for (k = 0; k < ks; k++) {
         if (key[k] != 'j' && dicty[key[k] - 'a'] == 1) {
             keyT[i][j] = key[k];
@@ -89,7 +88,7 @@ void generateKeyTable(char key[], int ks, char keyT[5][5]) {
         }
     }
 
-    // fill the rest with other letters
+
     for (k = 0; k < 26; k++) {
         if (dicty[k] == 0) {
             keyT[i][j] = (char)(k + 'a');
@@ -102,7 +101,7 @@ void generateKeyTable(char key[], int ks, char keyT[5][5]) {
     }
 }
 
-// Search for positions of a and b in key square
+
 void search(char keyT[5][5], char a, char b, int arr[]) {
     int i, j;
     if (a == 'j') a = 'i';
@@ -114,7 +113,7 @@ void search(char keyT[5][5], char a, char b, int arr[]) {
                 arr[0] = i;
                 arr[1] = j;
             }
-            else if (keyT[i][j] == b) {
+            if (keyT[i][j] == b) {
                 arr[2] = i;
                 arr[3] = j;
             }
@@ -127,16 +126,25 @@ int mod5(int a) {
     return (a % 5 + 5) % 5;
 }
 
-// Ensure plaintext length is even
+// Ensure plaintext is valid
 int prepare(char str[], int ptrs) {
-    if (ptrs % 2 != 0) {
-        str[ptrs++] = 'z'; // padding
-        str[ptrs] = '\0';
+    for (int i = 0; i < ptrs; i += 2) {
+        if (str[i] == str[i+1]) {
+            for (int j = ptrs; j > i+1; j--) {
+                str[j] = str[j-1];
+            }
+            str[i+1] = 'x';
+            ptrs++;
+        }
     }
+    if (ptrs % 2 != 0) {
+        str[ptrs++] = 'z';
+    }
+    str[ptrs] = '\0';
     return ptrs;
 }
 
-// Encryption
+
 void encrypt(char str[], char keyT[5][5], int ps) {
     int i, a[4];
     for (i = 0; i < ps; i += 2) {
@@ -157,28 +165,28 @@ void encrypt(char str[], char keyT[5][5], int ps) {
     }
 }
 
-// Decryption
+
 void decrypt(char str[], char keyT[5][5], int ps) {
     int i, a[4];
     for (i = 0; i < ps; i += 2) {
         search(keyT, str[i], str[i + 1], a);
 
-        if (a[0] == a[2]) { // same row
+        if (a[0] == a[2]) { 
             str[i] = keyT[a[0]][mod5(a[1] - 1)];
             str[i + 1] = keyT[a[2]][mod5(a[3] - 1)];
         }
-        else if (a[1] == a[3]) { // same column
+        else if (a[1] == a[3]) {
             str[i] = keyT[mod5(a[0] - 1)][a[1]];
             str[i + 1] = keyT[mod5(a[2] - 1)][a[3]];
         }
-        else { // rectangle swap
+        else { 
             str[i] = keyT[a[0]][a[3]];
             str[i + 1] = keyT[a[2]][a[1]];
         }
     }
 }
 
-// Wrapper for encryption
+
 void encryptByPlayfairCipher(char str[], char key[]) {
     int ps, ks;
     char keyT[5][5];
@@ -196,7 +204,7 @@ void encryptByPlayfairCipher(char str[], char key[]) {
     encrypt(str, keyT, ps);
 }
 
-// Wrapper for decryption
+
 void decryptByPlayfairCipher(char str[], char key[]) {
     int ps, ks;
     char keyT[5][5];
@@ -213,16 +221,21 @@ void decryptByPlayfairCipher(char str[], char key[]) {
     decrypt(str, keyT, ps);
 }
 
-// Driver code
+
 int main() {
     char str[SIZE], key[SIZE];
 
     printf("Simulating Playfair Cipher\n");
 
-    strcpy(key, "Monopoly");
-    printf("Key text: %s\n", key);
+    printf("Enter key text: ");
+    fgets(key, SIZE, stdin);
+    key[strcspn(key, "\n")] = 0;  // remove newline
 
-    strcpy(str, "VARSHINI");
+    printf("Enter plain text: ");
+    fgets(str, SIZE, stdin);
+    str[strcspn(str, "\n")] = 0;  // remove newline
+
+    printf("\nKey text: %s\n", key);
     printf("Plain text: %s\n", str);
 
     encryptByPlayfairCipher(str, key);
@@ -239,6 +252,7 @@ int main() {
 
 
 ## Output:
-<img width="560" height="307" alt="image" src="https://github.com/user-attachments/assets/02f7ea3a-8e6b-4582-97ff-d03912260afe" />
+<img width="595" height="384" alt="image" src="https://github.com/user-attachments/assets/cf7ce468-bd57-429a-a45e-91011e66af4f" />
+
 
 
