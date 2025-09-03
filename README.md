@@ -255,6 +255,7 @@ int main() {
 <img width="595" height="384" alt="image" src="https://github.com/user-attachments/assets/cf7ce468-bd57-429a-a45e-91011e66af4f" />
 
 
-## RESULT:
-The program implementing the Caesar cipher for encryption and decryption has been successfully 
+
+## RESULT :
+The program implementing the Hill cipher for encryption and decryption has been successfully 
 executed, and the results have been verified.
